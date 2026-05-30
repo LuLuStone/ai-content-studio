@@ -1,0 +1,27 @@
+# Web 框架
+fastapi==0.115.12
+uvicorn[standard]==0.34.2
+python-multipart==0.0.20
+
+# 数据库
+sqlalchemy==2.0.41
+pymysql==1.1.1
+alembic==1.15.2
+
+# Redis + Celery
+redis==5.2.1
+celery[redis]==5.4.0
+
+# AI SDK
+openai==1.82.0
+
+# 音频处理
+pydub==0.25.1
+
+# 数据校验
+pydantic==2.11.2
+pydantic-settings==2.9.1
+
+# 工具
+python-dotenv==1.1.0
+aiofiles==24.1.0
