@@ -54,6 +54,29 @@ Celery 异步任务队列，支持并发生成。实时进度弹窗，逐句展�
 
 ---
 
+## 📸 界面预览
+
+<table>
+<tr>
+<td align="center"><strong>首页 · 统一创作入口</strong></td>
+<td align="center"><strong>音色管理 · 系统 + 自定义</strong></td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/首页.png" width="100%" /></td>
+<td><img src="docs/screenshots/音色管理.png" width="100%" /></td>
+</tr>
+<tr>
+<td align="center"><strong>任务进度 · 实时音频生成状态</strong></td>
+<td align="center"><strong>详情页 · 播放器 + 脚本</strong></td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/进度弹窗动图.gif" width="100%" /></td>
+<td><img src="docs/screenshots/详情页.png" width="100%" /></td>
+</tr>
+</table>
+
+---
+
 ## 🏗 技术架构
 
 ```
