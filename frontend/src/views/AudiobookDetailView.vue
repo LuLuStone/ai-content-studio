@@ -20,8 +20,8 @@
         </div>
       </section>
 
-      <div class="player-card">
-        <audio controls style="width: 100%" :src="`/api/audiobooks/${detail.id}/audio`" />
+      <div style="margin-bottom: var(--space-xl)">
+        <AudioPlayer :src="`/api/audiobooks/${detail.id}/audio`" :title="detail.title" />
       </div>
 
       <!-- Characters -->
@@ -57,11 +57,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeft, Download, Delete } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { getAudiobook, deleteAudiobook, type AudiobookDetail } from '../api/audiobook'
+import AudioPlayer from '../components/AudioPlayer.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -75,8 +76,6 @@ onMounted(async () => {
   catch { ElMessage.error('加载失败') }
   finally { loading.value = false }
 })
-
-onUnmounted(() => { if (audioRef.value) { audioRef.value.pause(); audioRef.value.currentTime = 0 } })
 
 function handleDownload() {
   const a = document.createElement('a')
@@ -112,12 +111,6 @@ function formatDuration(s?: number) {
   font-size: 12px; font-weight: 600; letter-spacing: 0.5px;
   padding: 4px 12px; border-radius: var(--r-pill);
 }
-
-.player-card {
-  background: var(--surface-card); border: 1px solid var(--hairline);
-  border-radius: var(--r-xl); padding: var(--space-lg); margin-bottom: var(--space-xl);
-}
-.player-card audio { border-radius: var(--r-md); }
 
 .section-title { font-family: var(--font-display); font-size: 24px; font-weight: 300; color: var(--ink); margin-bottom: var(--space-lg); }
 .script-section { margin-bottom: var(--space-xl); }

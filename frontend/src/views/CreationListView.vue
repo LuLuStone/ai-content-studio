@@ -78,7 +78,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { ArrowLeft, Search } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
@@ -88,6 +88,10 @@ import { deletePodcast } from '../api/podcast'
 import { deleteAudiobook } from '../api/audiobook'
 import { deleteVideo } from '../api/video'
 import { deleteImage } from '../api/image'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+gsap.registerPlugin(ScrollTrigger)
 
 const router = useRouter()
 const items = ref<CreationItem[]>([])
@@ -126,6 +130,10 @@ async function fetchList() {
     const res = await getAllCreations({ page: currentPage.value, page_size: pageSize.value, type: filterType.value, keyword: keyword.value })
     items.value = res.items
     total.value = res.total
+    nextTick(() => {
+      const rows = document.querySelectorAll('.creation-row')
+      if (rows.length) gsap.fromTo(rows, { x: -16, opacity: 0 }, { x: 0, opacity: 1, duration: 0.35, stagger: 0.04, ease: 'power2.out' })
+    })
   } catch { ElMessage.error('加载失败') }
   finally { loading.value = false }
 }

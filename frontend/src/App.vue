@@ -30,7 +30,16 @@
         </nav>
       </header>
       <main class="app-main">
-        <router-view />
+        <router-view v-slot="{ Component, route }">
+          <transition
+            :css="false"
+            @before-enter="onBeforeEnter"
+            @enter="onEnter"
+            @leave="onLeave"
+          >
+            <component :is="Component" :key="route.path" />
+          </transition>
+        </router-view>
       </main>
     </div>
   </el-config-provider>
@@ -39,6 +48,17 @@
 <script setup lang="ts">
 import { Setting } from '@element-plus/icons-vue'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
+import gsap from 'gsap'
+
+function onBeforeEnter(el: Element) {
+  gsap.set(el, { opacity: 0, y: 12 })
+}
+function onEnter(el: Element, done: () => void) {
+  gsap.to(el, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out', onComplete: done })
+}
+function onLeave(el: Element, done: () => void) {
+  gsap.to(el, { opacity: 0, y: -8, duration: 0.2, ease: 'power2.in', onComplete: done })
+}
 </script>
 
 <style>

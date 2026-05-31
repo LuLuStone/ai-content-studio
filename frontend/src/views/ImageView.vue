@@ -26,16 +26,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getImages, type ImageListItem } from '../api/image'
+import gsap from 'gsap'
 
 const list = ref<ImageListItem[]>([])
 const loading = ref(false)
 
 onMounted(async () => {
   loading.value = true
-  try { list.value = await getImages() }
+  try {
+    list.value = await getImages()
+    nextTick(() => {
+      const cards = document.querySelectorAll('.image-card')
+      if (cards.length) gsap.fromTo(cards, { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, stagger: 0.06, ease: 'power2.out' })
+    })
+  }
   catch { ElMessage.error('加载失败') }
   finally { loading.value = false }
 })

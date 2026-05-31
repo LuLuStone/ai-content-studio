@@ -24,7 +24,7 @@
         </div>
       </div>
       <div class="pd-bar">
-        <div class="pd-bar-fill" :style="{ width: progress + '%' }"></div>
+        <div ref="barFillRef" class="pd-bar-fill" :style="{ width: progress + '%' }"></div>
       </div>
 
       <!-- Body: Timeline + Content -->
@@ -120,7 +120,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onUnmounted } from 'vue'
+import { ref, computed, watch, onUnmounted, nextTick } from 'vue'
+import gsap from 'gsap'
 
 interface StepData {
   stage?: string
@@ -197,6 +198,14 @@ const typeLabel = computed(() => {
 const playSrc = ref('')
 const playRef = ref<HTMLAudioElement>()
 const isPlaying = ref(false)
+const barFillRef = ref<HTMLElement>()
+
+// Animate progress bar with GSAP
+watch(() => props.progress, (newVal) => {
+  if (barFillRef.value) {
+    gsap.to(barFillRef.value, { width: newVal + '%', duration: 0.6, ease: 'power2.out' })
+  }
+})
 
 function handlePlay() {
   if (!playRef.value || !playSrc.value) {
@@ -274,7 +283,14 @@ function startRevealAnimation() {
   let acc = 0
   delays.forEach((delay, i) => {
     acc += delay
-    stageTimers.push(setTimeout(() => { revealStage.value = i }, acc))
+    stageTimers.push(setTimeout(() => {
+      revealStage.value = i
+      nextTick(() => {
+        const sections = document.querySelectorAll('.pd-section')
+        const target = sections[i] as HTMLElement
+        if (target) gsap.fromTo(target, { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out' })
+      })
+    }, acc))
   })
 
   // Streaming lines

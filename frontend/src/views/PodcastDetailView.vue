@@ -24,8 +24,8 @@
       </section>
 
       <!-- Player -->
-      <div class="player-card">
-        <audio ref="audioRef" controls style="width: 100%" :src="audioUrl" />
+      <div style="margin-bottom: var(--space-xl)">
+        <AudioPlayer :src="audioUrl" :title="detail.title" />
       </div>
 
       <!-- Script -->
@@ -54,26 +54,34 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeft, Download, Delete } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { getPodcast, deletePodcast, getPodcastAudioUrl, type PodcastDetail } from '../api/podcast'
+import gsap from 'gsap'
+import AudioPlayer from '../components/AudioPlayer.vue'
 
 const route = useRoute()
 const router = useRouter()
 const detail = ref<PodcastDetail | null>(null)
 const loading = ref(false)
-const audioRef = ref<HTMLAudioElement>()
-
 const audioUrl = computed(() => detail.value ? getPodcastAudioUrl(detail.value.id) : '')
 
 onMounted(() => fetchDetail())
-onUnmounted(() => { if (audioRef.value) { audioRef.value.pause(); audioRef.value.currentTime = 0 } })
 
 async function fetchDetail() {
   loading.value = true
-  try { detail.value = await getPodcast(route.params.id as string) }
+  loading.value = true
+  try {
+    detail.value = await getPodcast(route.params.id as string)
+    nextTick(() => {
+      const tl = gsap.timeline({ defaults: { ease: 'power2.out' } })
+      tl.fromTo('.detail-hero', { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 })
+        .fromTo('.player-card', { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4 }, '-=0.2')
+        .fromTo('.script-line', { x: -16, opacity: 0 }, { x: 0, opacity: 1, duration: 0.35, stagger: 0.04 }, '-=0.2')
+    })
+  }
   catch { ElMessage.error('加载失败') }
   finally { loading.value = false }
 }
@@ -120,14 +128,6 @@ function formatDuration(seconds?: number) {
   font-size: 12px; font-weight: 600; letter-spacing: 0.5px;
   padding: 4px 12px; border-radius: var(--r-pill);
 }
-
-/* Player */
-.player-card {
-  background: var(--surface-card); border: 1px solid var(--hairline);
-  border-radius: var(--r-xl); padding: var(--space-lg);
-  margin-bottom: var(--space-xl);
-}
-.player-card audio { border-radius: var(--r-md); }
 
 /* Script */
 .section-title {

@@ -33,9 +33,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getPodcasts, deletePodcast, type PodcastListItem } from '../api/podcast'
+import gsap from 'gsap'
 
 const list = ref<PodcastListItem[]>([])
 const loading = ref(false)
@@ -44,7 +45,13 @@ onMounted(() => fetchList())
 
 async function fetchList() {
   loading.value = true
-  try { list.value = await getPodcasts() }
+  try {
+    list.value = await getPodcasts()
+    nextTick(() => {
+      const cards = document.querySelectorAll('.content-card')
+      if (cards.length) gsap.fromTo(cards, { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, stagger: 0.06, ease: 'power2.out' })
+    })
+  }
   catch { ElMessage.error('加载失败') }
   finally { loading.value = false }
 }

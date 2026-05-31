@@ -216,7 +216,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { Upload, Close } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
@@ -228,6 +228,7 @@ import { getVideos } from '../api/video'
 import { getImages } from '../api/image'
 import { getVoices, type VoiceItem } from '../api/voice'
 import TaskProgressDialog from '../components/TaskProgressDialog.vue'
+import gsap from 'gsap'
 
 const router = useRouter()
 const inputText = ref('')
@@ -239,7 +240,21 @@ const showProgressDialog = ref(false)
 const recentItems = ref<any[]>([])
 let pollTimer: ReturnType<typeof setInterval> | null = null
 
-onMounted(() => { fetchRecent(); restoreActiveTask(); loadCustomVoices() })
+onMounted(() => {
+  fetchRecent()
+  restoreActiveTask()
+  loadCustomVoices()
+  nextTick(() => animateHero())
+})
+
+function animateHero() {
+  const tl = gsap.timeline({ defaults: { ease: 'power2.out' } })
+  tl.fromTo('.hero-orb', { scale: 0, opacity: 0 }, { scale: 1, opacity: 0.4, duration: 1, stagger: 0.15 })
+    .fromTo('.hero-title', { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, '-=0.6')
+    .fromTo('.hero-subtitle', { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5 }, '-=0.4')
+    .fromTo('.input-card', { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5 }, '-=0.3')
+    .fromTo('.type-card', { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, stagger: 0.08 }, '-=0.2')
+}
 onUnmounted(() => { if (pollTimer) clearInterval(pollTimer) })
 
 async function restoreActiveTask() {
@@ -347,6 +362,9 @@ async function handleSubmit() {
     const res = await createContent({ input_text: inputText.value, type: selectedType.value as any, options: opts[selectedType.value] || {} })
     currentTask.value = { task_id: res.task_id, type: selectedType.value, status: 'pending', progress: 0 }
     startPolling(res.task_id)
+    nextTick(() => {
+      gsap.fromTo('.task-card', { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: 'power2.out' })
+    })
   } catch (e: any) { ElMessage.error(e.message || '提交失败') }
   finally { submitting.value = false }
 }
@@ -357,9 +375,21 @@ function startPolling(taskId: string) {
     try {
       const s = await getTaskStatus(taskId)
       currentTask.value = s
+      // Animate progress bar smoothly
+      nextTick(() => {
+        const bar = document.querySelector('.task-bar-fill') as HTMLElement
+        if (bar) gsap.to(bar, { width: s.progress + '%', duration: 0.6, ease: 'power2.out' })
+      })
       if (s.status === 'completed' || s.status === 'failed') {
         clearInterval(pollTimer!)
-        if (s.status === 'completed') { ElMessage.success('创作完成！'); fetchRecent() }
+        if (s.status === 'completed') {
+          ElMessage.success('创作完成！')
+          fetchRecent()
+          nextTick(() => {
+            const items = document.querySelectorAll('.recent-item')
+            if (items.length) gsap.fromTo(items, { x: -20, opacity: 0 }, { x: 0, opacity: 1, duration: 0.4, stagger: 0.05, ease: 'power2.out' })
+          })
+        }
       }
     } catch {}
   }, 2000)
