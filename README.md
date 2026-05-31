@@ -48,6 +48,20 @@ Celery 异步任务队列，支持并发生成。实时进度弹窗，逐句展�
 
 </td>
 </tr>
+<tr>
+<td>
+
+### 🎵 自定义音频播放器
+基于 Web Audio API 的实时频谱可视化，音频频率驱动波形跳动，对数频率映射 + 整体音量兜底，全频段响应。可点击进度条，播放/暂停动画，静止呼吸灯效果。
+
+</td>
+<td>
+
+### ✨ GSAP 动画
+全站 GSAP 动画编排：路由切换过渡、Hero 入场序列、卡片 stagger 入场、进度条平滑动效、对话框分段揭示。流畅自然，告别生硬跳转。
+
+</td>
+</tr>
 </table>
 
 > 🚧 **视频**和**图片**模块开发中，敬请期待。
@@ -267,6 +281,8 @@ docker-compose up -d
 | 按钮 | 胶囊形 `border-radius: 9999px` |
 | 卡片 | 16px 圆角，1px hairline 边框 |
 | 装饰 | 渐变光球（mint / peach / lavender / sky / rose） |
+| 动画 | GSAP 3.15 + ScrollTrigger |
+| 频谱 | Web Audio API AnalyserNode + 对数频率映射 |
 
 ---
 
@@ -290,7 +306,10 @@ ai-content-studio/
 │   ├── src/
 │   │   ├── api/                 # API 调用封装
 │   │   ├── components/          # 通用组件
+│   │   │   ├── AudioPlayer.vue   # 自定义音频播放器（频谱可视化）
 │   │   │   └── TaskProgressDialog.vue
+│   │   ├── composables/          # Vue 组合式函数
+│   │   │   └── useGsap.ts        # GSAP 动画复用
 │   │   ├── views/               # 页面视图
 │   │   ├── router/              # 路由配置
 │   │   └── stores/              # Pinia 状态管理
